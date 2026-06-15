@@ -1,0 +1,6 @@
+{
+  "name": "Unblocked Games Hub",
+  "description": "A premium, ad-free curated browser games arcade for students, matching unblocked HTML5 titles with an interactive study-disguise mode, stats trackers, and custom bookmarking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
