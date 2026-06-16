@@ -13,69 +13,80 @@ import SnakeGame from './components/SnakeGame';
 import Game2048 from './components/Game2048';
 import SpaceShooter from './components/SpaceShooter';
 import IdleGame from './components/IdleGame';
-import DisguiseScreen from './components/DisguiseScreen';
 
 const DEFAULT_GAMES: Game[] = [
   {
-    id: 'space-miner-clicker',
-    title: 'Space Miner Clicker',
-    description: 'Mine stardust, build thermodynamic auto-machinery, and research orbital stellar grids in this retro idle tycoon game.',
-    category: 'idle',
-    isNative: true,
-    iconName: 'Cpu',
-    colorTheme: 'indigo',
-    rating: 4.9,
-    playedCount: 228,
-    playTime: 0,
-    isFavorite: false,
-  },
-  {
-    id: 'cosmic-defender',
-    title: 'Cosmic Defender',
-    description: 'Control a high-velocity space interceptor jet. Fire blasters at incoming celestial asteroids and capture power-ups.',
-    category: 'action',
-    isNative: true,
-    iconName: 'Zap',
-    colorTheme: 'amber',
-    rating: 4.8,
-    playedCount: 312,
-    playTime: 0,
-    isFavorite: false,
-  },
-  {
-    id: 'neon-snake',
-    title: 'Retro Neon Snake',
-    description: 'Maneuver an optical neon construct. Consume floating data nodules to expand the lattice while evading grid sector walls.',
+    id: 'pixel-shooter',
+    title: 'Pixel Shooter',
+    description: 'A thrilling 3D pixelated retro shooter game. Face off against enemies, pick up items, and secure victory with amazing shooting skills.',
     category: 'arcade',
-    isNative: true,
-    iconName: 'Compass',
-    colorTheme: 'cyan',
-    rating: 4.7,
-    playedCount: 194,
+    isNative: false,
+    externalUrl: 'https://ubg77.github.io/pixel-shooter/',
+    iconName: 'Gamepad2',
+    colorTheme: 'indigo',
+    rating: 4.8,
+    playedCount: 0,
     playTime: 0,
     isFavorite: false,
   },
   {
-    id: 'number-merge-2048',
-    title: 'Number Merge 2048',
-    description: 'Implement strategic layout predictions. Shift tiles in coordinate quadrants to merge numerical cubes and reach 2048.',
+    id: 'block-blast',
+    title: 'Block Blast',
+    description: 'An addictive and vibrant block puzzle game. Fit diverse shapes onto the board, clear lines, and blast your way to a high score.',
     category: 'puzzle',
-    isNative: true,
-    iconName: 'Award',
+    isNative: false,
+    externalUrl: 'https://d11jzht7mj96rr.cloudfront.net/games/2024/unity3/block-blast/index-gg.html',
+    iconName: 'Gamepad2',
     colorTheme: 'emerald',
-    rating: 4.6,
-    playedCount: 114,
+    rating: 4.9,
+    playedCount: 0,
+    playTime: 0,
+    isFavorite: false,
+  },
+  {
+    id: 'woodoku',
+    title: 'Woodoku',
+    description: 'An elegant and relaxing wood block puzzle game. Match wood blocks in rows, columns, or squares to clear them and achieve high scores.',
+    category: 'puzzle',
+    isNative: false,
+    externalUrl: 'https://html5.gamedistribution.com/9ed0d4b243484a6cb2456068085e0aa2/?gd_sdk_referrer_url=https://www.bubbleshooter.net/game/woodoku/',
+    iconName: 'Gamepad2',
+    colorTheme: 'purple',
+    rating: 4.8,
+    playedCount: 0,
+    playTime: 0,
+    isFavorite: false,
+  },
+  {
+    id: 'hangman',
+    title: 'Hangman',
+    description: 'A classic and engaging word guessing game. Guess letters to figure out the secret word before your attempts run out!',
+    category: 'puzzle',
+    isNative: false,
+    externalUrl: 'https://fourneauxthibaut.github.io/Hangman/',
+    iconName: 'Gamepad2',
+    colorTheme: 'purple',
+    rating: 4.8,
+    playedCount: 0,
     playTime: 0,
     isFavorite: false,
   }
 ];
 
 export default function App() {
+  if (typeof window !== 'undefined' && (window.location.pathname === '/blank' || window.location.pathname.endsWith('/blank') || window.location.pathname.endsWith('/blank/'))) {
+    return (
+      <div className="w-full h-full min-h-screen bg-[#0d1117] flex flex-col items-center justify-center text-slate-500 font-mono text-xs gap-2 select-none">
+        <Gamepad2 className="w-8 h-8 text-slate-750 animate-bounce" />
+        <span>Custom HTML Workspace Frame Ready</span>
+      </div>
+    );
+  }
+
   const [games, setGames] = useState<Game[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<GameCategory | 'all' | 'favorite'>('all');
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
-  const [isDisguised, setIsDisguised] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [showAddGameModal, setShowAddGameModal] = useState<boolean>(false);
   const [sessionTime, setSessionTime] = useState<number>(0);
@@ -93,12 +104,12 @@ export default function App() {
       const savedGames = localStorage.getItem('unblock_arcade_games_collection');
       if (savedGames) {
         const parsed = JSON.parse(savedGames);
-        // Sync defaults in case schema changed, keep custom items
-        const customs = parsed.filter((g: Game) => !g.isNative);
-        const savedNativeStates = parsed.filter((g: Game) => g.isNative);
+        // Sync defaults in case schema changed, keep custom items (custom ids start with 'custom-')
+        const customs = parsed.filter((g: Game) => g.id.startsWith('custom-'));
+        const savedDefaultStates = parsed.filter((g: Game) => !g.id.startsWith('custom-'));
 
         const loaded: Game[] = DEFAULT_GAMES.map(def => {
-          const matched = savedNativeStates.find((s: Game) => s.id === def.id);
+          const matched = savedDefaultStates.find((s: Game) => s.id === def.id);
           if (matched) {
             return {
               ...def,
@@ -131,18 +142,6 @@ export default function App() {
   useEffect(() => {
     sounds.setMute(isMuted);
   }, [isMuted]);
-
-  // Keyboard shortcut for Panic/Disguise screen: Esc key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        sounds.playBounce();
-        setIsDisguised(true);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   // Tracking game time dynamically
   useEffect(() => {
@@ -292,25 +291,10 @@ export default function App() {
     return `${mins}m ${secs}s`;
   };
 
-  if (isDisguised) {
-    return <DisguiseScreen onExit={() => setIsDisguised(false)} />;
-  }
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       
-      {/* Top Banner Warning Notification */}
-      <div className="bg-indigo-900/60 border-b border-indigo-850/40 text-indigo-200 px-4 py-2.5 text-xs text-center flex items-center justify-center gap-2 relative">
-        <span className="bg-indigo-800 text-white font-mono font-bold px-1.5 py-0.5 rounded text-[10px]">ESC CONTROL</span>
-        <span>Teacher nearby? Hit the <strong>Escape</strong> button or click the lock icon to instantly disguise your screen as a Biology or Math helper!</span>
-        <button 
-          id="trigger-panic-disguise"
-          onClick={() => { sounds.playBounce(); setIsDisguised(true); }}
-          className="ml-2 font-semibold text-white underline hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
-        >
-          <EyeOff className="w-3.5 h-3.5" /> Force Disguise
-        </button>
-      </div>
+
 
       {/* Main Navbar */}
       <header className="border-b border-slate-900 bg-slate-950/80 sticky top-0 backdrop-blur-md z-40 px-6 py-4 flex items-center justify-between">
@@ -334,15 +318,6 @@ export default function App() {
             title={isMuted ? "Unmute Sound Engine" : "Mute Sound Engine"}
           >
             {isMuted ? <VolumeX className="w-5 h-5 text-rose-400" /> : <Volume2 className="w-5 h-5 text-indigo-400" />}
-          </button>
-
-          <button
-            id="nav-panic-trigger"
-            onClick={() => { sounds.playBounce(); setIsDisguised(true); }}
-            className="p-2 rounded-lg bg-slate-900 hover:bg-rose-950/30 text-slate-400 hover:text-rose-400 transition cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
-            title="Panic Disguise"
-          >
-            <Shield className="w-4 h-4 text-rose-500" /> Disguise (Esc)
           </button>
 
           <button
@@ -382,16 +357,6 @@ export default function App() {
                 <span className="text-slate-400 font-mono">Session time:</span>
                 <span className="font-bold text-white font-mono">{formatTime(sessionTime)}</span>
               </div>
-
-              {/* Mega Big Red Escape Panic Indicator */}
-              <button
-                id="in-game-panic-trigger"
-                onClick={() => { sounds.playExplosion(); setIsDisguised(true); }}
-                className="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-extrabold px-5 py-2.5 rounded-xl flex items-center gap-2 hover:indigo-shadow transition text-xs shadow-lg animate-pulse border-2 border-red-500 cursor-pointer"
-                title="Saves state instantly and triggers note disguise"
-              >
-                <Shield className="w-4.5 h-4.5 fill-white text-rose-600" /> PANIC BUTTON (Press Escape)
-              </button>
             </div>
           </div>
 
@@ -419,12 +384,37 @@ export default function App() {
                   </a>
                 </div>
                 <iframe
-                  id="external-unblocked-game-frame"
+                  id={
+                    activeGame.id === 'woodoku' || activeGame.id === 'pixel-shooter' || activeGame.id === 'hangman'
+                      ? 'innerFrame'
+                      : activeGame.id === 'block-blast' 
+                        ? 'gameFrame' 
+                        : 'external-unblocked-game-frame'
+                  }
+                  name={
+                    activeGame.id === 'woodoku' || activeGame.id === 'block-blast' || activeGame.id === 'pixel-shooter' || activeGame.id === 'hangman'
+                      ? 'innerFrame' 
+                      : undefined
+                  }
+                  data-src={activeGame.id === 'block-blast' ? './index-gg.html' : undefined}
                   src={activeGame.externalUrl}
                   title={activeGame.title}
                   className="w-full flex-1 border-0"
+                  scrolling={activeGame.id === 'block-blast' ? 'no' : undefined}
+                  style={
+                    activeGame.id === 'block-blast' 
+                       ? { pointerEvents: 'auto' } 
+                       : activeGame.id === 'pixel-shooter' || activeGame.id === 'woodoku' || activeGame.id === 'hangman'
+                        ? { pointerEvents: 'auto', overflow: 'auto' } 
+                        : undefined
+                  }
+                  allowFullScreen
                   allow="autoplay; fullscreen; keyboard"
-                  sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                  sandbox={
+                    activeGame.id === 'woodoku' || activeGame.id === 'block-blast' || activeGame.id === 'pixel-shooter' || activeGame.id === 'hangman'
+                      ? "allow-scripts allow-popups allow-forms allow-same-origin allow-popups-to-escape-sandbox allow-downloads allow-storage-access-by-user-activation"
+                      : "allow-scripts allow-popups allow-forms allow-same-origin allow-popups-to-escape-sandbox allow-downloads allow-modals allow-storage-access-by-user-activation"
+                  }
                 />
               </div>
             )}
@@ -601,7 +591,7 @@ export default function App() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      {!game.isNative && (
+                      {game.id.startsWith('custom-') && (
                         <button
                           id={`del-custom-${game.id}`}
                           onClick={(e) => handleDeleteCustomGame(game.id, e)}
@@ -622,15 +612,31 @@ export default function App() {
             </div>
           ) : (
             <div id="no-games-found-placeholder" className="py-20 text-center text-slate-500 border border-dashed border-slate-900 rounded-2xl bg-slate-900/10 flex flex-col items-center justify-center gap-3">
-              <EyeOff className="w-10 h-10 stroke-1" />
-              <p className="text-xs text-slate-400">No unblocked game titles match your search filters.</p>
-              <button
-                id="reset-discovered-filters"
-                onClick={() => { sounds.playClick(); setSearchQuery(''); setSelectedCategory('all'); }}
-                className="bg-slate-900 text-slate-300 hover:text-white rounded-lg px-4 py-2 text-xs transition border border-slate-800 cursor-pointer"
-              >
-                Clear Filters
-              </button>
+              <EyeOff className="w-10 h-10 stroke-1 text-slate-600" />
+              {games.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-2 max-w-sm px-4">
+                  <p className="text-sm font-semibold text-slate-300">Your Hub is Empty!</p>
+                  <p className="text-xs text-slate-500">We have removed all default games as requested. Click the button below or "Add Custom" in the top bar to bookmark secure unblocked web game URLs.</p>
+                  <button
+                    id="add-first-game-btn"
+                    onClick={() => { sounds.playClick(); setShowAddGameModal(true); }}
+                    className="bg-indigo-605 bg-indigo-650/10 border border-indigo-700/50 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded-lg px-4 py-2 mt-2 text-xs font-bold transition flex items-center gap-1.5 shadow-md cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" /> Add Custom Game Track
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs text-slate-400">No unblocked game titles match your search filters.</p>
+                  <button
+                    id="reset-discovered-filters"
+                    onClick={() => { sounds.playClick(); setSearchQuery(''); setSelectedCategory('all'); }}
+                    className="bg-slate-900 text-slate-300 hover:text-white rounded-lg px-4 py-2 text-xs transition border border-slate-800 cursor-pointer"
+                  >
+                    Clear Filters
+                  </button>
+                </>
+              )}
             </div>
           )}
         </section>
