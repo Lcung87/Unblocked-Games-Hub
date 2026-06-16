@@ -304,7 +304,7 @@ export default function App() {
             <div className="absolute inset-0 bg-black/10"></div>
           </div>
           <div>
-            <h1 className="text-lg font-black tracking-tight text-white leading-5">UNBLOCKED HUB</h1>
+            <h1 className="text-lg font-black tracking-tight text-white leading-5">UNBLOCKED GAMES HUB</h1>
             <span className="text-[10px] text-slate-400 font-mono tracking-wider">SECURE CLASSROOM ARCADE</span>
           </div>
         </div>
@@ -318,14 +318,6 @@ export default function App() {
             title={isMuted ? "Unmute Sound Engine" : "Mute Sound Engine"}
           >
             {isMuted ? <VolumeX className="w-5 h-5 text-rose-400" /> : <Volume2 className="w-5 h-5 text-indigo-400" />}
-          </button>
-
-          <button
-            id="nav-add-game-btn"
-            onClick={() => { sounds.playClick(); setShowAddGameModal(true); }}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 shadow-md hover:shadow-indigo-500/10 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" /> Add Custom
           </button>
         </div>
       </header>
@@ -425,38 +417,7 @@ export default function App() {
       {/* Main Dashboard Layout */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 flex flex-col gap-6">
         
-        {/* Analytics Statistics Panel Cards */}
-        <section id="arcade-stats-banner" className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-slate-900/40 p-4 rounded-xl border border-slate-900/60 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
-              <Clock className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block">Total Play Time</span>
-              <span className="text-base font-bold text-white font-mono">{formatTime(userStats.totalPlayTime)}</span>
-            </div>
-          </div>
 
-          <div className="bg-slate-900/40 p-4 rounded-xl border border-slate-900/60 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-              <Activity className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block">Games Launched</span>
-              <span className="text-base font-bold text-white font-mono">{userStats.totalGamesPlayed} play sessions</span>
-            </div>
-          </div>
-
-          <div className="bg-slate-900/40 p-4 rounded-xl border border-slate-900/60 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 shrink-0">
-              <Heart className="w-5 h-5 fill-pink-500/10" />
-            </div>
-            <div>
-              <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block">Favorite Titles</span>
-              <span className="text-base font-bold text-white font-mono">{userStats.favoriteGamesCount} standard games</span>
-            </div>
-          </div>
-        </section>
 
         {/* Search, Discovery & Categories filters */}
         <section className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-900 pb-5">
